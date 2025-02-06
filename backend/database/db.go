@@ -6,10 +6,16 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func Connect() *sql.DB {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Ошибка загрузки .env файла: %v", err)
+	}
+
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
