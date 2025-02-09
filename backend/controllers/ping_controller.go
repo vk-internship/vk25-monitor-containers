@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"log"
 	"monitoring-backend/models"
 	"monitoring-backend/services"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,7 +37,13 @@ func (c *PingController) CreateOrUpdatePing(ctx *gin.Context) {
 		return
 	}
 
+	if ping.IsSuccess {
+		now := time.Now()
+		ping.LastSuccessTime = &now
+	}
+
 	if err := c.service.CreateOrUpdatePing(ping); err != nil {
+		log.Printf("Ошибка при создании/обновлении ping: %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

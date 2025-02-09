@@ -16,7 +16,8 @@ func InitDB(db *sql.DB) error {
             id SERIAL PRIMARY KEY,
             ip_address VARCHAR(15) NOT NULL UNIQUE,
             ping_time TIMESTAMP NOT NULL,
-            is_success BOOLEAN NOT NULL
+            is_success BOOLEAN NOT NULL,
+			last_success_time TIMESTAMP
         );
     `
 	_, err := db.Exec(query)

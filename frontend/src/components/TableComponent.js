@@ -20,6 +20,12 @@ const columns = [
         key: 'is_success',
         render: (is_success) => (is_success ? '✅ Успешный' : '❌ Неуспешный'),
     },
+    {
+        title: 'Последний успешный пинг',
+        dataIndex: 'last_success_time',
+        key: 'last_success_time',
+        render: (text) => text ? formatDate(text) : '—',
+    },
 ];
 
 const formatDate = (dateString) => {
