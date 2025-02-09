@@ -27,7 +27,7 @@ func (c *PingController) GetPings(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, pings)
 }
 
-func (c *PingController) CreatePing(ctx *gin.Context) {
+func (c *PingController) CreateOrUpdatePing(ctx *gin.Context) {
 	var ping models.Ping
 
 	if err := ctx.ShouldBindJSON(&ping); err != nil {
@@ -35,10 +35,10 @@ func (c *PingController) CreatePing(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.CreatePing(ping); err != nil {
+	if err := c.service.CreateOrUpdatePing(ping); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "Пинг создан"})
+	ctx.JSON(http.StatusCreated, gin.H{"message": "Пинг создан или обновлен"})
 }

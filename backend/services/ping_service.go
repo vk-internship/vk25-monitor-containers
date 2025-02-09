@@ -17,6 +17,6 @@ func (s *PingService) GetAllPings() ([]models.Ping, error) {
 	return s.repo.GetAll()
 }
 
-func (s *PingService) CreatePing(result models.Ping) error {
-	return s.repo.Create(result)
+func (s *PingService) CreateOrUpdatePing(result models.Ping) error {
+	return s.repo.CreateOrUpdate(result)
 }
