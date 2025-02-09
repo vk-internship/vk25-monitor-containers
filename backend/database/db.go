@@ -21,18 +21,6 @@ func InitDB(db *sql.DB) error {
         );
     `
 	_, err := db.Exec(query)
-	if err != nil {
-		return fmt.Errorf("ошибка создания таблицы: %v", err)
-	}
-
-	addColumnQuery := `
-        ALTER TABLE pings
-        ADD COLUMN IF NOT EXISTS last_success_time TIMESTAMP;
-    `
-	_, err = db.Exec(addColumnQuery)
-	if err != nil {
-		return fmt.Errorf("ошибка добавления столбца last_success_time: %v", err)
-	}
 
 	return err
 }
