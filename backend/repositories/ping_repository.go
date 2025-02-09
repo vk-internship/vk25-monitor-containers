@@ -15,7 +15,7 @@ func NewPingRepository(db *sql.DB) *PingRepository {
 }
 
 func (r *PingRepository) GetAll() ([]models.Ping, error) {
-	rows, err := r.DB.Query("SELECT id, ip_address, ping_time, is_success FROM pings")
+	rows, err := r.DB.Query("SELECT id, ip_address, ping_time, is_success, last_success_time FROM pings")
 
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (r *PingRepository) GetAll() ([]models.Ping, error) {
 	for rows.Next() {
 		var ping models.Ping
 
-		err := rows.Scan(&ping.ID, &ping.IPAddress, &ping.PingTime, &ping.IsSuccess)
+		err := rows.Scan(&ping.ID, &ping.IPAddress, &ping.PingTime, &ping.IsSuccess, &ping.LastSuccessTime)
 
 		if err != nil {
 			return nil, err
@@ -41,13 +41,15 @@ func (r *PingRepository) GetAll() ([]models.Ping, error) {
 
 func (r *PingRepository) CreateOrUpdate(ping models.Ping) error {
 	query := `
-        INSERT INTO pings (ip_address, ping_time, is_success)
-        VALUES ($1, $2, $3)
+        INSERT INTO pings (ip_address, ping_time, is_success, last_success_time)
+        VALUES ($1, $2, $3, $4)
         ON CONFLICT (ip_address) DO UPDATE
-        SET ping_time = EXCLUDED.ping_time, is_success = EXCLUDED.is_success;
+        SET ping_time = EXCLUDED.ping_time, 
+			is_success = EXCLUDED.is_success, 
+			last_success_time = EXCLUDED.last_success_time;
     `
 
-	_, err := r.DB.Exec(query, ping.IPAddress, ping.PingTime, ping.IsSuccess)
+	_, err := r.DB.Exec(query, ping.IPAddress, ping.PingTime, ping.IsSuccess, ping.LastSuccessTime)
 
 	if err != nil {
 		return fmt.Errorf("ошибка выполнения запроса: %v", err)
