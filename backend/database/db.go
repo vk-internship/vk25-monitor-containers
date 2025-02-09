@@ -17,10 +17,22 @@ func InitDB(db *sql.DB) error {
             ip_address VARCHAR(15) NOT NULL UNIQUE,
             ping_time TIMESTAMP NOT NULL,
             is_success BOOLEAN NOT NULL,
-			last_success_time TIMESTAMP NULLABLE
+			last_success_time TIMESTAMP
         );
     `
 	_, err := db.Exec(query)
+	if err != nil {
+		return fmt.Errorf("ошибка создания таблицы: %v", err)
+	}
+
+	addColumnQuery := `
+        ALTER TABLE pings
+        ADD COLUMN IF NOT EXISTS last_success_time TIMESTAMP;
+    `
+	_, err = db.Exec(addColumnQuery)
+	if err != nil {
+		return fmt.Errorf("ошибка добавления столбца last_success_time: %v", err)
+	}
 
 	return err
 }

@@ -23,9 +23,10 @@ type Config struct {
 }
 
 type PingResult struct {
-	IPAddress string    `json:"ip_address"`
-	PingTime  time.Time `json:"ping_time"`
-	IsSuccess bool      `json:"is_success"`
+	IPAddress       string     `json:"ip_address"`
+	PingTime        time.Time  `json:"ping_time"`
+	IsSuccess       bool       `json:"is_success"`
+	LastSuccessTime *time.Time `json:"last_success_time,omitempty"`
 }
 
 func main() {
@@ -100,6 +101,11 @@ func processContainers(config Config) error {
 			IsSuccess: isAlive,
 		}
 
+		if isAlive {
+			now := time.Now()
+			result.LastSuccessTime = &now
+		}
+
 		if err := sendToBackend(config.BackendAPIURL, result); err != nil {
 			log.Printf("Ошибка отправки данных: %v", err)
 		}
@@ -115,7 +121,7 @@ func pingIP(ip string) (bool, error) {
 	}
 
 	pinger.Count = 1
-	pinger.Timeout = 2 * time.Second
+	pinger.Timeout = 5 * time.Second
 	pinger.SetPrivileged(true)
 
 	if err := pinger.Run(); err != nil {
