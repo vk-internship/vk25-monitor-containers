@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 	"monitoring-backend/models"
 )
 
@@ -38,11 +39,19 @@ func (r *PingRepository) GetAll() ([]models.Ping, error) {
 	return pings, nil
 }
 
-func (r *PingRepository) Create(ping models.Ping) error {
-	_, err := r.DB.Exec(
-		"INSERT INTO ping_results (ip_address, ping_time, is_success) VALUES ($1, $2, $3)",
-		ping.IPAddress, ping.PingTime, ping.IsSuccess,
-	)
+func (r *PingRepository) CreateOrUpdate(ping models.Ping) error {
+	query := `
+        INSERT INTO pings (ip_address, ping_time, is_success)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (ip_address) DO UPDATE
+        SET ping_time = EXCLUDED.ping_time, is_success = EXCLUDED.is_success;
+    `
 
-	return err
+	_, err := r.DB.Exec(query, ping.IPAddress, ping.PingTime, ping.IsSuccess)
+
+	if err != nil {
+		return fmt.Errorf("ошибка выполнения запроса: %v", err)
+	}
+
+	return nil
 }

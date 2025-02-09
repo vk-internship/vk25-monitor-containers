@@ -10,6 +10,20 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func InitDB(db *sql.DB) error {
+	query := `
+        CREATE TABLE IF NOT EXISTS pings (
+            id SERIAL PRIMARY KEY,
+            ip_address VARCHAR(15) NOT NULL UNIQUE,
+            ping_time TIMESTAMP NOT NULL,
+            is_success BOOLEAN NOT NULL
+        );
+    `
+	_, err := db.Exec(query)
+
+	return err
+}
+
 func Connect() *sql.DB {
 	err := godotenv.Load(".env")
 	if err != nil {
